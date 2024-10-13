@@ -49,7 +49,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=12, blank=True)
-    role = models.CharField(choices=RoleChoice.choices, blank=True, null=True)
+    role = models.PositiveSmallIntegerField(choices=RoleChoice.choices, blank=True, null=True)
 
     # reqquired fields
     date_joined = models.DateTimeField(auto_now_add=True)
