@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+   Custome Dashboard
+{% endblock title %}
+
+
+{% block content %}
+    <h1>{{ request.user.getRole }}</h1>
+{% endblock content %}
+

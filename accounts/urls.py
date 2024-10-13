@@ -6,4 +6,10 @@ from . import views
 urlpatterns = [
     path("registerUser/", views.registerUser, name="register-user"),
     path("registerVendor/",views.registerVendor, name="register-vendor"),
+
+    path("login/", views.login, name="login"),
+    path("logout/", views.logout, name="logout"),
+    path("myAccount/", views.myAccount, name="myAccount"),
+    path("custDashboard/", views.custDashboard, name="custDashboard"),
+    path("vendorDashboard/", views.vendorDashboard, name="vendorDashboard"),
 ]
