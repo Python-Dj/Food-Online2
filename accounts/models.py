@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     class RoleChoice(models.IntegerChoices):
-        RESTAURANT = 1, 'Restaurant'
+        VENDOR = 1, 'Vendor'
         CUSTOMER = 2, 'Customer'
 
     firstName = models.CharField(max_length=50)

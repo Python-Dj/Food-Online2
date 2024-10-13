@@ -5,6 +5,8 @@ from django.contrib import messages
 from .forms import UserForm
 from .models import User
 
+from vendor.forms import VendorForm
+from vendor.models import Vendor
 
 
 
@@ -36,3 +38,34 @@ def registerUser(request):
         "form": form
     }
     return render(request, "accounts/registerUser.html", context)
+
+
+def registerVendor(request):
+    if request.method == "POST":
+        uform = UserForm(request.POST)
+        vform = VendorForm(request.POST, request.FILES)
+        if uform.is_valid() and vform.is_valid():
+            uform.cleaned_data.pop("confirm_password")
+            user_data = uform.cleaned_data
+            user = User.objects.create_user(**user_data)
+            user.role = User.RoleChoice.VENDOR
+            user.save()
+            vendor = vform.save(commit=False)
+            vendor.user = user
+            vendor.user_profile = user.user_profile
+            vendor.save()
+            messages.success(request, "Your account has been register succesfully! wait for the approval.")
+            return redirect("register-vendor")
+        else:
+            context={
+                "userForm": uform,
+                "vendorForm": vform
+            }
+            return render(request, "accounts/registerVendor.html", context)
+    userForm = UserForm()
+    vendorForm = VendorForm()
+    context = {
+        "userform": userForm,
+        "vendorform": vendorForm
+    }
+    return render(request, "accounts/registerVendor.html", context)
