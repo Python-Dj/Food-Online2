@@ -1,0 +1,11 @@
+{% autoescape off %}
+
+    {% if is_approved %}
+        Hi {{ user.firstName }} {{ user.lastName }}
+        We congratulates! you, Your restaurant has been approved.
+    {% else %}
+        Sorry to say that, This time you are not eligible for Approval.
+        See You nest time, Thanks!
+    {% endif %}
+
+{% endautoescape %}
