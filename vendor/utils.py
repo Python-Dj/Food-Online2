@@ -1,6 +1,16 @@
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
+
+
+
+# Restric the vendor from accessing customer page.
+def check_role_vendor(user):
+    if user.role == 1:
+        return True
+    else:
+        raise PermissionDenied
 
 
 def send_notification(mail_subject, context):
