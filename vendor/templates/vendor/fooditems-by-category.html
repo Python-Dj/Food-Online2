@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Vendor Profile
+{% endblock title %}
+
+
+{% block content %}
+    <!-- Main Section Start -->
+    <div class="main-section">
+        
+        <!-- include cover photo here -->
+        {% include "includes/cover.html" %}
+
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <!-- Load sidebar here. -->
+                         {% include "vendor/includes/vendor-sidebar.html" %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <h5>Build Your Food Menu</h5>
+                                <hr>
+                                <button class="btn btn-info" onclick="history.back()"><i class="bi bi-skip-backward-circle-fill"></i>&nbsp;Back</button>
+                                <br><br>
+                                <h6>Category: <span class="text-uppercase text-success">{{ category }}</span></h6>
+                                <!-- Restaurant Menu Builder Start -->
+                                <table class="table table-hover table-borderless">
+                                    {% if fooditems %}
+                                        {% for food in fooditems %}
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-left">{{ forloop.counter }}</td>
+                                                    <td class="text-left">
+                                                        <a href="">
+                                                            <p class="mb-0 font-weight-bold">{{ food.food_title }}</p>
+                                                            <small class="text-muted">{{ food.description }}</small>
+                                                        </a>
+                                                    </td>
+                                                    <td><i class="bi bi-trash text-danger"></i> &nbsp;&nbsp;&nbsp; <i class="bi bi-pencil-fill"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        {% endfor %}
+                                    {% else %}
+                                            <h5 class="text-center">No food items found.</h5>
+                                        <div class="text-center"">
+                                            <a href="#" class="btn btn-success"><i class="bi bi-plus-circle"></i>&nbsp;Add Food</a>
+                                        </div>
+                                    {% endif %}
+                                </table>
+                                <!-- Restaurants Menu Builder Ends -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- Main Section End -->
+{% endblock content %}
+
