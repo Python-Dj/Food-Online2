@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.http import urlsafe_base64_decode
+from django.template.defaultfilters import slugify
 
 from django.contrib import messages
 from django.contrib import auth
@@ -61,7 +62,7 @@ def registerUser(request):
 
 def registerVendor(request):
     if request.user.is_authenticated:
-        messages.warning("You are alredy logged in")
+        messages.warning(request, "You are alredy logged in")
         return redirect("myAccount")
     elif request.method == "POST":
         uform = UserForm(request.POST)
@@ -74,6 +75,8 @@ def registerVendor(request):
             user.save()
             vendor = vform.save(commit=False)
             vendor.user = user
+            vendor_name = vform.cleaned_data["vendor_name"]
+            vendor.vendor_slug = slugify(vendor_name)+'-'+str(user.id)
             vendor.user_profile = user.user_profile
             vendor.save()
 
@@ -117,7 +120,7 @@ def activate(request, uidb64, token):
 
 def login(request):
     if request.user.is_authenticated:
-        messages.warning("You are alredy logged in")
+        messages.warning(request, "You are alredy logged in")
         return redirect("myAccount")
     elif request.method == "POST":
         email = request.POST["email"]
