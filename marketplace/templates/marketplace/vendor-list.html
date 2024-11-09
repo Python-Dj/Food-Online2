@@ -47,9 +47,11 @@
                                                         </h5>
                                                     </div>
                                                     <span class="post-categories">
-                                                        <span class="font-weight-bold">Address : </span>{{ vendor.user_profile.address }}
+                                                        <span class="font-weight-bold">Address : </span><small>{{ vendor.user_profile.address }}</small><br>
+                                                        {% if source_location %}
+                                                            <small><b>{{ vendor.kms }}</b>km away from {{ source_location }}</small>
+                                                        {% endif %}
                                                     </span>
-                                                    
                                                 </div>
                                                 <div class="list-option">
 

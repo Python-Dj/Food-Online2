@@ -1,13 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.contrib.auth.decorators import login_required
+
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 
 from vendor.models import Vendor
 from menu.models import Category, FoodItem
 
 from .models import Cart
 from .context_processors import get_cart_counter, get_cart_amount
+
 
 
 
@@ -115,3 +120,34 @@ def deleteCart(request, cart_id):
             })
         except:
             return JsonResponse({"status": "Failed", "message": "No food item to delete!"})
+        
+
+def search(request):
+    if not 'address' in request.GET:
+        return redirect("marketplace")
+    else:
+        keyword = request.GET["keyword"]
+        address = request.GET["address"]
+        latitude = request.GET["lat"]
+        longitude = request.GET["lng"]
+        radius = request.GET["radius"]
+
+        # get vendor id that has the fooditem user is looking for
+        get_vendor_by_fooditems = FoodItem.objects.filter(food_title__icontains=keyword, is_available=True).values_list('vendor', flat=True)
+
+        if longitude and longitude and radius:
+            pnt = GEOSGeometry("POINT({lng} {lat})".format(lng=longitude, lat=latitude), srid=4326)
+            vendors = Vendor.objects.filter(
+                Q(is_approved=True, vendor_name__icontains=keyword, user__is_active=True) | Q(id__in=get_vendor_by_fooditems),
+                user_profile__location__distance_lte=(pnt, D(km=radius)),
+            ).annotate(distance=Distance("user_profile__location", pnt)).order_by("distance")
+
+            for v in vendors:
+                v.kms = round(v.distance.km, 1)
+        vendors_count = vendors.count()
+        context = {
+            "vendors": vendors,
+            "vendors_count": vendors_count,
+            "source_location": address
+        }
+        return render(request, "marketplace/vendor-list.html", context)

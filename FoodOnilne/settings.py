@@ -1,3 +1,5 @@
+import os
+
 from decouple import config
 from pathlib import Path
 
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
     'vendor',
     'menu',
     'marketplace',
+    'django.contrib.gis',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -75,7 +78,8 @@ WSGI_APPLICATION = 'FoodOnilne.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
@@ -147,3 +151,9 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'foodOnline marketplace <agentgupta216@gmail.com>'
 
 GOOGLE_API_KEY = config("GOOGLE_API_KEY")
+
+
+# GDAL 
+os.environ['PATH'] = os.path.join(BASE_DIR, '.venv\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
+os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, '.venv\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
+GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, '.venv\Lib\site-packages\osgeo\gdal.dll')
