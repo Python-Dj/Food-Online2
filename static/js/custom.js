@@ -175,7 +175,7 @@ $(document).ready(function(){
                 }
             }
         })
-    })
+    });
 
     // delete the cart element if quantity is 0
     function removeCartItem(cartItemQty, cartID){
@@ -206,5 +206,76 @@ $(document).ready(function(){
             $('#tax').html(response.cart_amount['tax'])
             $('#total').html(response.cart_amount['grandTotal'])
         }
-    }
+    };
+
+    // Add Openig Hours for Vendor
+    $('.add-hours').on('click', function(e){
+        e.preventDefault()
+        
+        let day = document.getElementById('id_day').value
+        let from_hour = document.getElementById('id_from_hour').value
+        let to_hour = document.getElementById('id_to_hour').value
+        let is_closed = document.getElementById('id_is_closed').checked
+        let url = document.getElementById('id_add_url').value
+        let csrftoken = $('input[name=csrfmiddlewaretoken]').val()
+        console.log(url)
+
+        if (is_closed){
+            is_closed = 'True'
+            condition = "day != ''"
+        }else{
+            is_closed = 'False'
+            condition = "day != '' && from_hour != '' && to_hour != ''"
+        }
+
+        if (eval(condition)){
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    "day": day,
+                    "from_hour": from_hour,
+                    "to_hour": to_hour,
+                    "is_closed": is_closed,
+                    "csrfmiddlewaretoken": csrftoken,
+                },
+                success: function(response){
+                    if (response.status == "success"){
+                        if (response.is_closed == "closed"){
+                            html = '<tr id="op-hr-'+response.id+'"><td><b>'+response.day+'</b></td><td>Closed</td><td><a href="#" data-url="/vendor/openingHours/remove/'+response.id+'/" class="remove_hours">Remove</a></td></tr>';
+                            $(".opening_hours").append(html)
+                            document.getElementById("opening_hours").reset();
+                        }else{
+                            html = '<tr id="op-hr-'+response.id+'"><td><b>'+response.day+'</b></td><td>'+response.from_hour+'&nbsp;<b>to</b>&nbsp;'+response.to_hour+'</td><td><a href="#" data-url="/vendor/openingHours/remove/'+response.id+'/" class="remove_hours">Remove</a></td></tr>';
+                            $(".opening_hours").append(html)
+                            document.getElementById("opening_hours").reset();
+                        }
+                    }else{
+                        swal(response.message, "", "error")
+                    }
+                }
+            })
+        }else{
+           swal("please fill all fields", "", "info")
+        }
+    });
+
+    // Remove Opening Hours
+    $(".opening_hours").on("click", ".remove_hours", function(e){
+        e.preventDefault()
+        let url= $(this).attr('data-url')
+        console.log(url)
+
+        $.ajax({
+            type: "GET",
+            url: url,
+            success: function(response){
+                if (response.status == 'success'){
+                    document.getElementById("op-hr-"+response.id).remove()
+                }else{
+                    swal(response.message, "", "error")
+                }
+            }
+        })
+    });
 })

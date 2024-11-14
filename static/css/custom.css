@@ -2,3 +2,16 @@
     padding: 2px 1.75rem;
     font-size: 12px;
 }
+
+table > tbody > tr > td {
+    border: none !important;
+    padding-bottom: 0;
+}
+
+#opening_hours select {
+    padding: 5px 10px !important;
+}
+
+.btn.btn-success.add-hours{
+    padding: 7px 15px 7px 15px;
+}

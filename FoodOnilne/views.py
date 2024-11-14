@@ -8,14 +8,14 @@ from vendor.models import Vendor
 
 
 def get_or_create_current_location(request):
-    if request.session:
+    if request.session.get("lng"):
         longitude = request.session.get('lng')
         latitude = request.session.get('lat')
         # print(dict(request.session))
 
         pnt = GEOSGeometry("POINT({lng} {lat})".format(lng=longitude, lat=latitude), srid=4326)
         return pnt
-    elif request.GET:
+    elif request.GET.get('longitude'):
         longitude = request.GET.get('longitude')
         latitude = request.GET.get('latitude')
 
