@@ -38,7 +38,7 @@ function onPlaceChanged (){
             $('#id_longitude').val(longitude);
             $('#id_address').val(address)
         }
-    });
+    })
     // loop through the address component and assign other address data
     console.log(place.address_components)
     for(let i=0; i<place.address_components.length; i++){
@@ -78,30 +78,12 @@ $(document).ready(function(){
         $.ajax({
             type: 'GET',
             url: url,
-            data: [],
             success: function(response){
                 console.log(response)
-                if (response.status == 'Login-Required'){
-                    swal({
-                        title: "Login Required!",
-                        text: response.message,
-                        icon: "warning",
-                        button: "Login",
-                      }).then(function(){
-                        window.location='/login'
-                      })
-                }else if(response.status == 'Failed'){
-                    swal({
-                        title: "Warning!",
-                        text: response.message,
-                        icon: "error",
-                        buttons: "ok",
-                      })
-                }else{
-                    $('#cart_counter').html(response.cart_counter['cart_count'])
-                    $('#qty-'+food_id).html(response.qty)
-                    cartAmountDetails(response)
-                }
+                console.log(food_id)
+                $('#cart_counter').html(response.cart_counter['cart_count'])
+                $('#qty-'+food_id).html(response.qty)
+                cartAmountDetails(response)
             }
         })
     })
@@ -175,7 +157,7 @@ $(document).ready(function(){
                 }
             }
         })
-    });
+    })
 
     // delete the cart element if quantity is 0
     function removeCartItem(cartItemQty, cartID){
@@ -203,10 +185,16 @@ $(document).ready(function(){
     function cartAmountDetails(response){
         if (window.location.pathname == '/cart/'){
             $('#subtotal').html(response.cart_amount['subTotal'])
-            $('#tax').html(response.cart_amount['tax'])
             $('#total').html(response.cart_amount['grandTotal'])
+            taxes = response.cart_amount.all_taxes
+            console.log(taxes)
+            for(tax in taxes){
+                for(amount in taxes[tax]){
+                    $("#tax-"+tax).html(taxes[tax][amount])
+                }
+            }
         }
-    };
+    }
 
     // Add Openig Hours for Vendor
     $('.add-hours').on('click', function(e){
@@ -258,7 +246,7 @@ $(document).ready(function(){
         }else{
            swal("please fill all fields", "", "info")
         }
-    });
+    })
 
     // Remove Opening Hours
     $(".opening_hours").on("click", ".remove_hours", function(e){
@@ -277,5 +265,5 @@ $(document).ready(function(){
                 }
             }
         })
-    });
+    })
 })

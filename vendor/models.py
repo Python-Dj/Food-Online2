@@ -42,6 +42,8 @@ class Vendor(models.Model):
         current_time = datetime.now().strftime("%H:%M:%S")
         
         for hour in current_op_hrs:
+            if hour.is_closed:
+                return False
             start = str(datetime.strptime(hour.from_hour, "%I:%M %p").time())
             end = str(datetime.strptime(hour.to_hour, "%I:%M %p").time())
             if current_time > start and current_time < end:

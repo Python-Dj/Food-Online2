@@ -28,7 +28,6 @@ def marketplace(request):
 
 def vendor_details(request, slug):
     vendor = Vendor.objects.get(vendor_slug=slug)
-    print(vendor.is_open())
     categories = Category.objects.filter(vendor=vendor).prefetch_related(
         Prefetch(
             "fooditems",
@@ -39,7 +38,6 @@ def vendor_details(request, slug):
     op_hrs = OpeningHour.objects.filter(vendor=vendor)
     today_day = datetime.today().isoweekday()
     today_op_hrs = op_hrs.filter(day=today_day)
-    print(today_op_hrs)
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -62,24 +60,16 @@ def add_to_cart(request, food_id):
                 cart, created = Cart.objects.get_or_create(user=request.user, fooditem=fooditem)
                 cart.quantity += 1
                 cart.save()
-                if created:
-                    return JsonResponse({
-                        "status": "Success",
-                        "message": "New food item added to your Cart!",
-                        "cart_counter": get_cart_counter(request),
-                        "qty": cart.quantity,
-                        "cart_amount": get_cart_amount(request)
-                    })
-                else:
-                    return JsonResponse({
-                        "status": "Success",
-                        "message": "Food quantity Increased!",
-                        "cart_counter": get_cart_counter(request),
-                        "qty": cart.quantity,
-                        "cart_amount": get_cart_amount(request)
-                    })
-            except:
-                return JsonResponse({"status": "Falied", "message": "Something is wrong with your Cart or Fooditem!"})
+                response = {
+                    "status": "Success",
+                    "message": "Food quantity Increased!",
+                    "cart_counter": get_cart_counter(request),
+                    "qty": cart.quantity,
+                    "cart_amount": get_cart_amount(request)
+                }
+                return JsonResponse(response)
+            except Exception as e:
+                return JsonResponse({"status": "Falied", "message": "Fooditem dosen't exist!"})
         else:
             return JsonResponse({"status": "Failed", "message": "Invalid request!"})
     return JsonResponse({"status": "Login-Required", "message": "please login to continue!"})
