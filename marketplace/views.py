@@ -81,10 +81,10 @@ def removeFromCart(request, pk):
             try:
                 fooditem = FoodItem.objects.get(pk=pk)
                 cart = Cart.objects.get(fooditem=fooditem, user=request.user)
-                if cart.quantity > 0:
+                if cart.quantity:
                     cart.quantity -= 1
                     cart.save()
-                else:
+                if cart.quantity == 0:
                     cart.delete()
                 return JsonResponse({
                         "status": "Success",

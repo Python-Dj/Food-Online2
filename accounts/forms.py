@@ -32,7 +32,7 @@ class UserProfileForm(forms.ModelForm):
     cover_photo = forms.FileField(widget=forms.FileInput(attrs={"class": "btn btn-info"}), validators=[allow_image_only_validator])
     class Meta:
         model = UserProfile
-        exclude = ["user", "created_at", "modified_at"]
+        exclude = ["user", "created_at", "modified_at", "location"]
         
     # def __init__(self, *args, **kwargs):
     #     super(UserProfileForm, self).__init__(*args, **kwargs)

@@ -19,5 +19,6 @@ urlpatterns = [
 
     # Search
     path('search/', MarketpPlaceView.search, name="search"),
+    path("customer/", include("customers.urls")),
     
 ] +static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

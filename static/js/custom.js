@@ -123,6 +123,7 @@ $(document).ready(function(){
                     $('#qty-'+food_id).html(response.qty)
                     if (window.location.pathname == '/cart/'){
                         removeCartItem(response.qty, cart_id)
+                        console.log(response.qty)
                         checkEmptyCart()
                     }
                     cartAmountDetails(response)
@@ -161,7 +162,7 @@ $(document).ready(function(){
 
     // delete the cart element if quantity is 0
     function removeCartItem(cartItemQty, cartID){
-        if (cartItemQty <=0){
+        if (cartItemQty <= 0){
             document.getElementById('cart-item-'+cartID).remove()
         }
     }
