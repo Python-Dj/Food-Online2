@@ -1,8 +1,11 @@
+import razorpay
+
 from django.shortcuts import render, redirect
 import simplejson as json
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
+from django.conf import settings
 
 from marketplace.context_processors import get_cart_amount
 from marketplace.models import Cart
@@ -12,6 +15,9 @@ from vendor.utils import send_notification
 from .models import Order, Payment, OrderedFood
 from .forms import OrderForm
 from .utils import generate_order_number
+
+
+client = razorpay.Client(auth=(settings.RZP_KEY_ID, settings.RZP_KEY_SECRET))
 
 
 @login_required(login_url="login")
@@ -41,9 +47,23 @@ def place_order(request):
             # Now order Id has been generate, we can add order_number
             order.order_number = generate_order_number(order.id)
             order.save()
+
+            #Razorpay payment Data
+            DATA = {
+                "amount": round(float(order.total)*100),
+                "currency": "INR",
+                "receipt": "order_receipt #"+order.order_number
+            }
+  
+            rzp_order = client.order.create(data=DATA)
+            rzp_order_id = rzp_order["id"]
+            
             context = {
                 "order": order,
-                "cart_items": cart_items
+                "cart_items": cart_items,
+                "rzp_order_id": rzp_order_id,
+                "RZP_KEY_ID": settings.RZP_KEY_ID,
+                "rzp_amount": round(float(order.total)*100),
             }
             return render(request, "orders/place-order.html", context)
         else:
