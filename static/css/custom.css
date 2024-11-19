@@ -15,3 +15,36 @@ table > tbody > tr > td {
 .btn.btn-success.add-hours{
     padding: 7px 15px 7px 15px;
 }
+
+/* Paypal and Razorpay images */
+.payment-method {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    gap: 20px;              /* Space between images */
+    padding: 2px;          /* Add some padding around the container */
+}
+
+.payment-method [type=radio] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.payment-method [type=radio] + img {
+    cursor: pointer;
+    width: 80px;            /* Reduced size by 30% (80px * 0.7) */
+    height: 40px;           /* Match width for circular shape */
+    border-radius: 8%;     /* Make the image circular */
+    border: 2px solid gray; /* Default outline */
+    object-fit: contain;    /* Ensure the full image is visible */
+    background-color: white; /* Add background for better visibility */
+    padding: 5px;
+    transition: border 0.3s; /* Smooth outline change */
+}
+
+.payment-method [type=radio]:checked + img {
+    border-color: red;      /* Change outline to red when selected */
+}
+
+
