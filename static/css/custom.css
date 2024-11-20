@@ -47,4 +47,6 @@ table > tbody > tr > td {
     border-color: red;      /* Change outline to red when selected */
 }
 
-
+.table-generic > li > div {
+    padding: 10px;
+}

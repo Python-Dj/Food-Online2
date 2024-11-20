@@ -14,6 +14,7 @@ from .models import User
 
 from vendor.forms import VendorForm
 from vendor.models import Vendor
+from orders.models import Order
 
 from .utils import detectUser, send_varification_email, check_role_customer
 
@@ -153,7 +154,15 @@ def myAccount(request):
 @login_required(login_url="login")
 @user_passes_test(check_role_customer)
 def custDashboard(request):
-    return render(request, "accounts/custDashboard.html")
+    orders = Order.objects.filter(user=request.user, is_ordered=True)
+    recent_orders = orders.order_by("-created_at")[:5]
+    total_orders = orders.count()
+    context = {
+        "orders": orders,
+        "recent_orders": recent_orders,
+        "total_orders": total_orders,
+    }
+    return render(request, "accounts/custDashboard.html", context)
 
 
 def forgotPassword(request):

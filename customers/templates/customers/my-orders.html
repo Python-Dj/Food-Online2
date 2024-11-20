@@ -25,32 +25,7 @@
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                         <div class="user-dashboard loader-holder">
                             <div class="user-holder">
-                                <h5 class="text-uppercase">Overview</h5>
-                                <div class="row">
-                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                                        <div class="card">
-                                            <div class="card-header text-center">
-                                                Total Order
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <a href=""><h5 class="crad-title">{{ total_orders }}</h5></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                                        <div class="card">
-                                            <div class="card-header text-center">
-                                                <b>Logged in as:</b>&nbsp;&nbsp;{{ request.user.email }}
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <a href="{% url "customer-profile" %}"><h5 class="crad-title"><i class="bi bi-pencil-fill"></i> Edit Profile</h5></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <br>
-                                
-                                <h5>Recent Orders</h5>
+                                <h5>My Orders</h5>
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                         <div class="user-orders-list">
@@ -64,7 +39,7 @@
                                                         <div>Status</div>
                                                         <div>Details</div>
                                                     </li>
-                                                    {% for order in recent_orders %}
+                                                    {% for order in orders %}
                                                         <li class="order-heading-titles">
                                                             <div class="text-dark"><b>{{order.order_number}}</b></div>
                                                             <div>{{ order.created_at|date }}</div>
