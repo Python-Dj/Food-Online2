@@ -8,7 +8,8 @@ from django.http.response import JsonResponse
 from django.conf import settings
 
 from marketplace.context_processors import get_cart_amount
-from marketplace.models import Cart
+from marketplace.models import Cart, Tax
+from menu.models import FoodItem
 
 from vendor.utils import send_notification
 
@@ -27,8 +28,34 @@ def place_order(request):
     if cart_count <= 0:
         return redirect("marketplace")
     
+    vendors_id = []
+    for item in cart_items:
+        if item.fooditem.vendor.id not in vendors_id:
+            vendors_id.append(item.fooditem.vendor.id)
+
+    # data = {"vendor_id": {"subtotal": "amount", "tax_type": {"tax_percentage": "tax_amount"}}}
+    get_tax = Tax.objects.filter(is_active=True)
+    total_data = {}
+    for item in cart_items:
+        fooditem = FoodItem.objects.get(id=item.fooditem.id, vendor__id__in=vendors_id)
+        if fooditem.vendor.id in total_data:
+            total_data[fooditem.vendor.id]["subtotal"] += (fooditem.price * item.quantity)
+        else:
+            total_data[fooditem.vendor.id] = {"subtotal": (fooditem.price * item.quantity)}
+        
+        # Calculte tax data
+        for tax in get_tax:
+            subtotal = total_data[fooditem.vendor.id]["subtotal"]
+            tax_amount = round((subtotal * tax.tax_percentage/100), 2)
+            total_data[fooditem.vendor.id][tax.tax_type] = {str(tax.tax_percentage): str(tax_amount)}
+    
+    # Updating subtotal value Decimal to String.
+    for vendor_id in total_data:
+        total_data[vendor_id]["subtotal"] = str(total_data[vendor_id]["subtotal"])
+
+    
     cart_amounts = get_cart_amount(request)
-    sub_total = cart_amounts["subTotal"]
+    # sub_total = cart_amounts["subTotal"]
     tax_amount = cart_amounts["tax"]
     grand_total = cart_amounts["grandTotal"]
     tax_data = cart_amounts["all_taxes"]
@@ -41,11 +68,15 @@ def place_order(request):
             order.user = request.user
             order.total = grand_total
             order.tax_data = json.dumps(tax_data)
+            order.total_data = json.dumps(total_data)
             order.total_tax = tax_amount
             order.payment_method = pay_method
             order.save()
+
             # Now order Id has been generate, we can add order_number
             order.order_number = generate_order_number(order.id)
+
+            order.vendors.add(*vendors_id)
             order.save()
 
             #Razorpay payment Data

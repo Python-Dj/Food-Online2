@@ -46,6 +46,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Custom midddleware for accessing request obj in models.
+    'orders.middleware.RequestObjectMiddleware',
 ]
 
 ROOT_URLCONF = 'FoodOnilne.urls'

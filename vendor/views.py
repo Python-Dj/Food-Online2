@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.template.defaultfilters import slugify
 from django.http.response import JsonResponse
 from django.db import IntegrityError
+from datetime import datetime
+
+import simplejson as json
 
 from .models import Vendor, OpeningHour
 from .forms import VendorForm, OpeningHourForm
@@ -13,6 +16,7 @@ from accounts.models import UserProfile
 from accounts.forms import UserProfileForm
 from menu.models import Category, FoodItem
 from menu.forms import CategoryForm, FoodForm
+from orders.models import Order, OrderedFood
 
 from .utils import check_role_vendor
 
@@ -22,7 +26,34 @@ from .utils import check_role_vendor
 @login_required(login_url="login")
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    return render(request, "vendor/vendorDashboard.html")
+    vendor = Vendor.objects.get(user=request.user)
+    orders = vendor.orders.filter(is_ordered=True)
+    # orders = Order.objects.filter(vendors__in=[vendor], is_ordered=True)
+    recent_orders = orders.order_by("-created_at")[:5]
+
+    # Current Month Revenue
+    current_month = datetime.now().month
+    current_month_orders = orders.filter(created_at__month=current_month)
+    current_month_revenue = 0
+    for ord in current_month_orders:
+        data =  ord.get_total_by_vendor()
+        if data:
+            current_month_revenue += data["total"]
+
+    #Total Revenue
+    total_revenue = 0
+    for ord in orders:
+        data =  ord.get_total_by_vendor()
+        if data:
+            total_revenue += data["total"]
+    context = {
+        "orders": orders,
+        "orders_count": orders.count(),
+        "recent_orders": recent_orders,
+        "total_revenue": total_revenue,
+        "current_month_revenue": current_month_revenue,
+    }
+    return render(request, "vendor/vendorDashboard.html", context)
 
 
 @login_required(login_url="login")
@@ -254,3 +285,36 @@ def remove_opening_hours(request, pk):
                 return JsonResponse({"staus": "failed", "message": "not a valid opening hours ID!"})
         response = {"status": "failed", "message": "Invalid!"}
         return JsonResponse(response)
+    
+
+def orders(request):
+    vendor = Vendor.objects.get(user=request.user)
+    orders = vendor.orders.filter(is_ordered=True).order_by("-created_at")
+
+    context = {
+        "orders": orders,
+    }
+    return render(request, "vendor/orders.html", context)
+
+
+def order_details(request, order_number):
+    try:
+        vendor = Vendor.objects.get(user=request.user)
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        ordered_foods = OrderedFood.objects.filter(order=order, fooditem__vendor=vendor)
+
+        data = order.get_total_by_vendor()
+        subtotal = data["subtotal"]
+        total = data["total"]
+        tax_data = data["tax_data"]
+        
+        context = {
+            "order": order,
+            "ordered_foods": ordered_foods,
+            "tax_data": tax_data,
+            "sub_total": subtotal,
+            "total": total,
+        }
+        return render(request, "vendor/order-details.html", context)
+    except:
+        return redirect("vendor-dashboard")
