@@ -49,6 +49,7 @@ def send_varification_email(request, user, mail_subject, email_template):
         from_email,
         to=[to_email]
     )
+    mail.content_subtype = "html"
     mail.send()
 
 

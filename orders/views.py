@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 
 from marketplace.context_processors import get_cart_amount
 from marketplace.models import Cart, Tax
@@ -140,17 +141,26 @@ def payments(request):
                 )
                 ordered_food.save()
 
-            # SEND ORDER CONFIRMATION EMAIL
+            # SEND ORDER CONFIRMATION EMAIL TO CUSTOMER.
             mail_subject = "Thank you for ordering food with us."
             mail_template = "orders/order-confirmation-email.html"
+            ordered_food = OrderedFood.objects.filter(order=order)
+            customer_subtotal = 0
+            for food in ordered_food:
+                customer_subtotal += (food.price * food.quantity)
+            tax_data = json.loads(order.tax_data)
             context = {
                 "user": request.user,
                 "order": order,
+                "ordered_food": ordered_food,
                 "to_email": order.email,
+                "domain": get_current_site(request),
+                "subtotal": customer_subtotal,
+                "tax_data": tax_data,
             }
             send_notification(mail_subject, mail_template, context)
 
-            # Send Order Receive Email to the Vendor
+            # SEND ORDER RECEIVED EMAIL TO VENDOR.
             mail_subject = "You have received a new Order."
             mail_template = "orders/order-receive-email.html"
             to_emails = []

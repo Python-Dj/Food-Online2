@@ -47,3 +47,21 @@ table > tbody > tr > td {
     border-color: red;      /* Change outline to red when selected */
 }
 
+@media screen and (max-width: 480px) {
+    a.get-start-btn {
+        display: block;
+        margin-top: 15px !important;
+        margin-left: 0 !important;
+    }
+    .main-search-bar{
+        padding-top: 50px !important;
+        padding-bottom: 0 !important;
+    }
+    .user-dashboard{
+        width: 100% !important;
+    }
+}
+
+table td, table th {
+    line-height: 1rem !important;
+}

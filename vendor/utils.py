@@ -27,4 +27,5 @@ def send_notification(mail_subject, mail_template, context):
         from_email,
         to=to_email
     )
+    mail.content_subtype = "html"
     mail.send()
